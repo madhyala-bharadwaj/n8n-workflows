@@ -1,0 +1,286 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9f5810fa-710a-4777-8f6e-b4aad99c4b0e",
+      "name": "When chat message received",
+      "webhookId": "4f5cf53a-870d-4a73-aa42-24bad3911512"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Role: You are a helpful and professional customer support chatbot for an online learning platform.\n\nCore Instructions:\n\n1. Language: You must always respond in the exact same language the user uses. If the user writes in Hindi, you reply in Hindi. If they write in English, you reply in English.\n\n2. Grounding: Your only sources of information are the provided \"Course Data\" and \"FAQ Data\". You must not use any external knowledge or make assumptions.\n\n3. Anti-Hallucination: If an answer is not explicitly found in the \"Course Data\" or \"FAQ Data\", you must not guess or invent an answer. Follow the \"No Information Fallback\" rule.\n\nInteraction Flow:\n\n1. Initial Greeting:\nYour very first message to the user in a new conversation must be exactly: \"Welcome to our learning platform! How can I help you today?\"\n\n2. Response Logic (In this exact order of priority):\n - Priority 1: Course Match:\n   If the user's query clearly matches an item in the \"Course Data\", respond only with the course name and its description.\n\n - Priority 2: FAQ Match:\n   If the user's query clearly matches a question in the \"FAQ Data\", respond only with the exact corresponding answer from the data.\n\n - Priority 3: Unclear/Confusing Query:\n   If the user's query is ambiguous, nonsensical, or too vague to match, respond only with this exact text: \"Sorry, I didn't understand. Can you please ask in a simple way?\"\n\n - Priority 4: No Information Fallback:\n   If the query is clear, but the information is not found in either the \"Course Data\" or \"FAQ Data\", you must respond only with this exact text: \"Sorry, we don't have this information right now. We have noted your question. Please share your mobile number, so that our team can contact you soon.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        408,
+        0
+      ],
+      "id": "43f4e2ed-5bd3-4e72-b955-2802809de115",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "=models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        224,
+        224
+      ],
+      "id": "3ab1ac8f-d813-4a6c-b23a-0d4f5f90f6ac",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        224
+      ],
+      "id": "2f7e5a65-57bb-4f5a-a7d6-b29b7643a7f3",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1meRPWkESaG7xYrqjqJfyQsB4SSElCMO3lt_dX6Ao70w",
+          "mode": "list",
+          "cachedResultName": "n8n-web-data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1meRPWkESaG7xYrqjqJfyQsB4SSElCMO3lt_dX6Ao70w/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "courses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1meRPWkESaG7xYrqjqJfyQsB4SSElCMO3lt_dX6Ao70w/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        480,
+        224
+      ],
+      "id": "7628e016-c18c-4188-a9f3-7f8ae3a2b621",
+      "name": "Get course data"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1meRPWkESaG7xYrqjqJfyQsB4SSElCMO3lt_dX6Ao70w",
+          "mode": "list",
+          "cachedResultName": "n8n-web-data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1meRPWkESaG7xYrqjqJfyQsB4SSElCMO3lt_dX6Ao70w/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1058562554,
+          "mode": "list",
+          "cachedResultName": "faqs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1meRPWkESaG7xYrqjqJfyQsB4SSElCMO3lt_dX6Ao70w/edit#gid=1058562554"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        608,
+        224
+      ],
+      "id": "e237f4e5-37e0-4138-9272-e798d7dec49f",
+      "name": "Get FAQs"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1meRPWkESaG7xYrqjqJfyQsB4SSElCMO3lt_dX6Ao70w",
+          "mode": "list",
+          "cachedResultName": "n8n-web-data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1meRPWkESaG7xYrqjqJfyQsB4SSElCMO3lt_dX6Ao70w/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 94504022,
+          "mode": "list",
+          "cachedResultName": "unanswered-questions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1meRPWkESaG7xYrqjqJfyQsB4SSElCMO3lt_dX6Ao70w/edit#gid=94504022"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "question": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('question', ``, 'string') }}",
+            "mobile number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('mobile_number', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "question",
+              "displayName": "question",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mobile number",
+              "displayName": "mobile number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        736,
+        224
+      ],
+      "id": "d9500bf6-e209-43e1-a120-906a80056ad0",
+      "name": "Append row in sheet in Google Sheets"
+    },
+    {
+      "parameters": {
+        "content": "**Action Required**: \nUse the Embedded Chat mode. Paste the HTML snippet from the link into your website. Then, copy the Production URL from above and use it to replace the webhookUrl placeholder in the snippet.\n\nhttps://www.npmjs.com/package/@n8n/chat",
+        "height": 192,
+        "width": 304,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -128,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "6db60dc2-7e0b-4656-b993-ec945edbfc59",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Website Chatbot ",
+        "height": 80,
+        "width": 304,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        208,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "a5884317-f7c2-457d-a609-aef16e53b0e8",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get course data": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get FAQs": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d972c8a5-94d0-40ec-b544-82ba5c9b6955",
+  "meta": {
+    "instanceId": "656eb82938e89dd43389386c9b4c92f5a6c23a6f3329aa8650ca70911b7033f5"
+  },
+  "id": "et6TWfYYREpWijkv",
+  "tags": []
+}
